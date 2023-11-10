@@ -23,12 +23,12 @@ public class Version2 {
     public static void main(String[] args) throws IOException,
 			SolrServerException {
 
-       HttpSolrClient solr = new HttpSolrClient.Builder("http://localhost:8983/solr/miconsulta").build();
+       final SolrClient client = new HttpSolrClient.Builder("http://localhost:8983/solr/miconsulta").build();
 		
         SolrQuery query = new SolrQuery();
         
         //APERTURA ARCHIVO
-        String ruta = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\MBPRACICA1\\CISI.QRY";
+        String ruta = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\CISI.QRY";
         File archivo = new File(ruta);
         Scanner sc = new Scanner(archivo);
         
