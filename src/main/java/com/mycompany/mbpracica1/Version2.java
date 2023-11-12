@@ -37,7 +37,7 @@ public class Version2 {
         //LEEMOS
         StringBuilder palabras = new StringBuilder();
         int cuenta = 0;
-        while(sc.hasNext() && cuenta < 20)
+        while(sc.hasNext() && cuenta < 5)
         {
             String pal = sc.next();
             palabras.append(pal).append("");
