@@ -7,6 +7,7 @@ package com.mycompany.mbpracica1;
 import java.io.File;
 import java.util.Scanner;
 import java.io.*;
+import static java.lang.Thread.sleep;
 import java.util.*;
 import javax.sound.midi.Soundbank;
 import org.apache.solr.client.solrj.SolrClient;
@@ -20,28 +21,72 @@ import org.apache.solr.common.SolrInputDocument;
  * @author luism
  */
 public class Version1 {
-    public static void main (String [] args) throws IOException, SolrServerException{
-        String filename = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\MBPRACICA1\\CISI.ALL";
+    public static void main (String [] args) throws IOException, SolrServerException, InterruptedException{
+        String filename = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\CISI.ALL";
         Scanner scan = new Scanner(new File(filename));
+        
+        
+        String autor = " ";
+        String titulo = " ";
+        String texto = " ";
         while(scan.hasNextLine())
         {
-            int i = 0; 
-            final SolrClient client = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
-            final SolrInputDocument doc = new SolrInputDocument();
             String line = scan.nextLine();
-            String [] fragments = line.split("(?<=I)");
-            for (String fragment : fragments)
-            {   
-               
-               System.out.println(fragment);
-               doc.addField(Integer.toString(i),fragments);
-               i++;
+            
+            if (line.startsWith(".I"))
+            {
+                 autor = " ";
+                 titulo = " ";
+                 texto = " ";
+                
+            }else if(line.startsWith(".T")){
+                titulo = scan.nextLine().trim();
+            
+            }else if(line.startsWith(".A")){
+                autor = scan.nextLine().trim();
+            
+            }else if(line.startsWith(".W")){
+                StringBuilder stb= new StringBuilder();
+                
+                while(scan.hasNextLine()){
+                    line = scan.nextLine();
+                    if(line.startsWith(".I") || line.startsWith(".A") || line.startsWith(".T")){
+                        break;
+                    }
+                    stb.append(line).append("\n");
+                }
+                texto = stb.toString().trim();
+                introducedoc(titulo, autor, texto);
             }
-            final UpdateResponse updateResponse = client.add("Luismi", doc);
-            client.commit("Luismi");
             
             
         }
+        
     }
+    
+     private static void introducedoc(String titulo, String autor, String texto) throws SolrServerException, IOException
+    {
+        if(titulo != " " && autor != " " && texto != " "){
+            System.out.println("El titulo es " + " "+ titulo);
+            System.out.println("El autor es " + " "+ autor);
+            System.out.println("El texto es " + " "+ texto);
+        
+        
+            SolrClient client = new HttpSolrClient.Builder("http://localhost:8983/solr/motores4").build();
+            SolrInputDocument doc = new SolrInputDocument();
+        
+            doc.addField("titulo", titulo);
+            doc.addField("autor", autor);
+            doc.addField("texto", texto);
+            client.add(doc);
+            client.commit();
+        }
+    }
+     
+    
+    
+   
+    
+    
     
 }
