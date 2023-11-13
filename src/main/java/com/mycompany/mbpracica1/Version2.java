@@ -4,8 +4,10 @@
  */
 package com.mycompany.mbpracica1;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 
 import org.apache.solr.client.solrj.SolrServerException;
@@ -23,36 +25,46 @@ public class Version2 {
     public static void main(String[] args) throws IOException,
 			SolrServerException {
 
-       final SolrClient client = new HttpSolrClient.Builder("http://localhost:8983/solr/miconsulta").build();
-		
-        SolrQuery query = new SolrQuery();
-        
-        //APERTURA ARCHIVO
-        String ruta = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\CISI.QRY";
-        File archivo = new File(ruta);
-        Scanner sc = new Scanner(archivo);
-        
-        
-        
-        //LEEMOS
-        StringBuilder palabras = new StringBuilder();
-        int cuenta = 0;
-        while(sc.hasNext() && cuenta < 5)
-        {
-            String pal = sc.next();
-            palabras.append(pal).append("");
+       
+       HttpSolrClient solr = new HttpSolrClient.Builder("http://localhost:8983/solr/motores4").build();
+       SolrQuery query = new SolrQuery();
+       
+       String ruta = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\CISI.QRY";
+       File filename = new File(ruta);
+       Scanner sc = new Scanner(filename);
+       int cuenta = 0;
+       StringBuilder palabras = new StringBuilder();
+       
+       
+       while(sc.hasNext() && cuenta < 5)
+       {
+           
+           String pal = sc.next();
+           if(!pal.matches("[0-9].*|\\..*"))
+           {
+            palabras.append(pal). append(" ");
             System.out.println(pal + " ");
-            cuenta++;
-        }
-        sc.close();
+            cuenta ++;
+           }
+       }
+       
+       
+       
+       sc.close();
+       
+       String consulta = palabras.toString().trim();
+       query.setQuery("*");
+       query.addFilterQuery("texto: " + consulta);
+       QueryResponse rsp = solr.query(query);
+       SolrDocumentList docs = rsp.getResults();
+       for (int i = 0; i<docs.size(); i++)
+       {
+           System.out.println(docs.get(i));
+       }
+
         
-        String consulta = palabras.toString().trim();
-        query.setQuery(consulta);
-        QueryResponse rsp = solr.query(query);
-        SolrDocumentList docs = rsp.getResults();
-	for (int i = 0; i < docs.size(); ++i) {
-            System.out.println(docs.get(i));
-        }
-    
+        
+        
+        
     }
 }
