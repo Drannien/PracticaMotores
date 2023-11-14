@@ -54,17 +54,38 @@ public class Version2 {
        
        String consulta = palabras.toString().trim();
        query.setQuery("*");
+       
+       SolrQuery query2 = new SolrQuery();
+       query2.setQuery("score");
+      
        query.addFilterQuery("texto: " + consulta);
+       query2.addFilterQuery("texto: " + consulta);
+       
        QueryResponse rsp = solr.query(query);
+       QueryResponse rsp2 = solr.query(query2);
+       
        SolrDocumentList docs = rsp.getResults();
+       SolrDocumentList docs2 = rsp2.getResults();
+       
        for (int i = 0; i<docs.size(); i++)
        {
            System.out.println(docs.get(i));
        }
+       
+       
+       //Pasar los rankings a converTrec y en converTrec crear el Trec File.
+       //converTrec(Rankings)
+       //
+       
 
         
         
         
+        
+    }
+    
+    private static void converTrec()
+    {
         
     }
 }
