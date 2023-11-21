@@ -23,6 +23,7 @@ import org.apache.solr.common.SolrDocument;
  * @author luism
  */
 public class Version3 {
+    static int nRanking = 1;
     
     public static int nConsultaParaCisi = 1;
     static int nConsulta = 1;
@@ -107,31 +108,11 @@ public class Version3 {
 
     }
 
-    private static void converTrec1(SolrDocumentList docs, int nConsulta) throws IOException
-    {
-        
-        String ruta = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\miTrec1.txt";
-        File filename = new File(ruta);
-        BufferedWriter escritor = new BufferedWriter(new FileWriter(filename,true));
-        int nRanking = 1;
-        for (SolrDocument doc: docs)
-        {
-            Object titulo = doc.getFieldValue("titulo");
-            Object autor = doc.getFieldValue("autor");
-            Object score  = doc.getFieldValue("score");
-            Object idp = doc.getFieldValue("idp");
-            
-            escritor.write(nConsulta + " " + "Q0" + " " + idp + " " + nRanking + " " + score + " " + "Luismi" + " " + "\n" );
-            nRanking++;
-            
-        }
-        escritor.close();
-        
-    }
+    
     
     private static void converTrec(SolrDocumentList docs, int nConsulta) throws IOException
     {
-        int nranking = 0;
+        
         String ruta = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\miTrec.TREC";
         File filename = new File(ruta);
         BufferedWriter escritor = new BufferedWriter(new FileWriter(filename,true));
@@ -149,8 +130,8 @@ public class Version3 {
             String patron = "[^a-zA-Z0-9\\s]"; 
             String idpSTR1 = idpSTR.replaceAll(patron, "");
             
-            escritor.write(nConsulta + " " + "Q0" + " " + idpSTR1 + " " + nranking + " " + scoreSTR + " " + "Luismi" + " " + "\n" );
-            nranking++;
+            escritor.write(nConsulta + " " + "Q0" + " " + idpSTR1 + " " + nRanking + " " + scoreSTR + " " + "Luismi" + " " + "\n" );
+            nRanking++;
         }
         escritor.close();
         
@@ -187,7 +168,7 @@ public class Version3 {
             //System.out.println(scoreSTR);
            
            
-            escritor.write(consulta + " " + cero + " " + documento + " " + scoreSTR + "\n");
+            escritor.write(consulta + " " + cero + " " + cero + " " + documento + "\n");
             
            
         }
@@ -199,5 +180,4 @@ public class Version3 {
     
 
 }
-
 
