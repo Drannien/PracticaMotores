@@ -50,17 +50,18 @@ public class Version3 {
                palabras.setLength(0);
                cuenta = 0;
                
-                while(cuenta <5)
+                while(cuenta <15)
                 {
                 String pal = sc.next();
                 palabras.append(pal). append(" ");
                 cuenta++;
                 
-                if(cuenta  ==5)
+                if(cuenta  ==15)
                 {
                 String consulta = palabras.toString().trim();
                 String consulta1 = " ";
                 consulta1 = eliminarPrimeraPalabra(consulta);
+                System.out.println(consulta1);
                 lanzaConsulta(consulta1);
                 }
                }
