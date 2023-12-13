@@ -56,8 +56,8 @@ public class Buscador1 {
        System.out.println("El campo es " + " " + campo);
        System.out.println("El texto es " + " " + texto); 
        query.setQuery("*");
-       query.setFields(campo);
-       query.addFilterQuery("texto: " + texto);
+       query.setFields("autor", "titulo", "score", "idp");
+       query.addFilterQuery(campo + " : " + texto);
        QueryResponse rsp = solr.query(query);
        docs = rsp.getResults();
        for (int i = 0; i<docs.size(); i++)
