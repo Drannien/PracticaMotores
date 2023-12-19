@@ -63,7 +63,7 @@ public class Version3 {
 
             // Imprime el contenido extraído
             for (String content: contentList) {
-                System.out.println(content);
+                //System.out.println(content);
                 lanzaConsulta1(content);
             }
             
@@ -91,16 +91,17 @@ public class Version3 {
     
     private static void lanzaConsulta1(String consulta) throws SolrServerException, IOException   
     {
-       HttpSolrClient solr = new HttpSolrClient.Builder("http://localhost:8983/solr/motores7").build();
+       HttpSolrClient solr = new HttpSolrClient.Builder("http://localhost:8983/solr/gate").build();
        SolrQuery query = new SolrQuery();
        String palabras = consulta.replaceAll("[^a-zA-Z0-9 ]", "");
-       //System.out.println(palabras); 
+       
+       System.out.println(palabras); 
        query.setQuery("*");
-       query.setFields("autor", "titulo", "score", "idp");
+       query.setFields("*");
        query.addFilterQuery("texto: " + palabras);
        QueryResponse rsp = solr.query(query);
        SolrDocumentList docs = rsp.getResults();
-       converTrec(docs,nConsulta);
+       //converTrec(docs,nConsulta);
        //System.out.println(nConsulta);
        nConsulta++;
        
@@ -191,7 +192,5 @@ public class Version3 {
         scan.close();
     }
     
-    
-
 }
 
