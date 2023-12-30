@@ -9,6 +9,8 @@ import java.util.Scanner;
 import java.io.*;
 import static java.lang.Thread.sleep;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.sound.midi.Soundbank;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -23,7 +25,7 @@ import org.apache.solr.common.SolrInputDocument;
 public class Version1 {
 
     public static void main(String[] args) throws IOException, SolrServerException, InterruptedException {
-        String filename = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\CISI.XML.xml";
+        String filename = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\corpuscompleto.xml";
         Scanner scan = new Scanner(new File(filename));
 
         int id = 1;
@@ -31,16 +33,17 @@ public class Version1 {
         String titulo = " ";
         String texto = " ";
         
-
-        String [] personas = new String[10000];
-        String [] organizaciones = new String[10000];
-        String [] lugares = new String[10000];
         
-        int personCount = 0;
-        int organizationCount = 0;
-        int locationCount = 0;
-
+        String persona = "Person";
+        String org = "Organization";
+        String lugar = "Location";
+        
+        StringBuilder stb1 = new StringBuilder();
+                
+        
+        
         while (scan.hasNextLine()) {
+            
             String line = scan.nextLine();
 
             if (line.startsWith(".I")) {
@@ -50,201 +53,143 @@ public class Version1 {
                 
                 
                 
-            } else if (line.startsWith(".T")) {
-                titulo = scan.nextLine().trim();
-                if (line.contains("<Person>")) {
-                        String[] parts = line.split("<Person>");
-                        if (parts.length > 1) {
-                            String word = parts[1].split("\\s+")[0];
-                            String word1 = extractNextWord(word);
-                            personas[personCount] = word1;
-                            personCount++;
-                        }
-                    }
-                    if (line.contains("<Organization>")) {
-                        String[] parts = line.split("<Organization>");
-                        if (parts.length > 1) {
-                            String word = parts[1].split("\\s+")[0];;
-                            String word1 = extractNextWord(word);
-                            organizaciones[organizationCount] = word1;
-                            organizationCount++;
-                        }
-
-                    }
-                    if (line.contains("<Location>")) {
-                        String[] parts = line.split("<Location>");
-                        if (parts.length > 1) {
-                            String word = parts[1].split("\\s+")[0];
-                            String word1 = extractNextWord(word);
-                            lugares[locationCount] = word1;
-                            locationCount++;
-                        }
-
-                    }
-            } else if (line.startsWith(".A")) {
+            }  
+            if (line.startsWith(".T")) {
+                StringBuilder stb = new StringBuilder();
+                while (scan.hasNextLine()) {
+                    line = scan.nextLine();
+                if (line.startsWith(".A")) {
+                    break;
+                }
+                stb.append(line).append("\n");
+            }
+            titulo = stb.toString().trim();
+                
+                
+            }
+            if (line.startsWith(".A")) {
                 autor = scan.nextLine().trim();
-                if (line.contains("<Person>")) {
-                        String[] parts = line.split("<Person>");
-                        if (parts.length > 1) {
-                            String word = parts[1].split("\\s+")[0];
-                            String word1 = extractNextWord(word);
-                            personas[personCount] = word1;
-                            personCount++;
-                        }
-                    }
-                    if (line.contains("<Organization>")) {
-                        String[] parts = line.split("<Organization>");
-                        if (parts.length > 1) {
-                            String word = parts[1].split("\\s+")[0];;
-                            String word1 = extractNextWord(word);
-                            organizaciones[organizationCount] = word1;
-                            organizationCount++;
-                        }
-
-                    }
-                    if (line.contains("<Location>")) {
-                        String[] parts = line.split("<Location>");
-                        if (parts.length > 1) {
-                            String word = parts[1].split("\\s+")[0];
-                            String word1 = extractNextWord(word);
-                            lugares[locationCount] = word1;
-                            locationCount++;
-                        }
-
-                    }
-            } else if (line.startsWith(".W")) {
+                
+                
+            } 
+            if (line.startsWith(".W")) {
                 StringBuilder stb = new StringBuilder();
 
                 while (scan.hasNextLine()) {
                     line = scan.nextLine();
                     if (line.startsWith(".I") || line.startsWith(".A") || line.startsWith(".T")) {
                         break;
-                    }
-
-                    // Buscar etiquetas y guardar la palabra siguiente
-                    if (line.contains("<Person>")) {
-                        String[] parts = line.split("<Person>");
-                        if (parts.length > 1) {
-                            String word = parts[1].split("\\s+")[0];
-                            String word1 = extractNextWord(word);
-                            personas[personCount] = word1;
-                            personCount++;
-                        }
-                    }
-                    if (line.contains("<Organization>")) {
-                        String[] parts = line.split("<Organization>");
-                        if (parts.length > 1) {
-                            String word = parts[1].split("\\s+")[0];;
-                            String word1 = extractNextWord(word);
-                            organizaciones[organizationCount] = word1;
-                            organizationCount++;
-                        }
-
-                    }
-                    if (line.contains("<Location>")) {
-                        String[] parts = line.split("<Location>");
-                        if (parts.length > 1) {
-                            String word = parts[1].split("\\s+")[0];
-                            String word1 = extractNextWord(word);
-                            lugares[locationCount] = word1;
-                            locationCount++;
-                        }
-
-                    }
+                    } 
 
                     stb.append(line).append("\n");
                 }
                 texto = stb.toString().trim();
-                //System.out.println("El autor es " + " " + autor );
-                //System.out.println("El titulo es " + " " + titulo );
-                //System.out.println("El texto es " + " " + texto );
-                //System.out.println("La persona es " + " " + nextPerson);
-                //System.out.println("La organizacion es " + " " + nextOrganization );
-                //System.out.println("El lugar es " + " " + nextLocation );
-                //for (int i = 0; i < personCount; i++) {
-
-                    //System.out.println("Documento" + id + " La persona" + " " + i + " es"  + " " + personas[i]);
-                    
-                //}
-                //System.out.println("Cantidad de personas en documento" + id + " : " + personCount);
-
-                //for (int i = 0; i < organizationCount; i++) {
-                    //System.out.println("Documento" + id + " El organizador" + " " + i + " es"  + " " + organizaciones[i]);
-                //}
-                //System.out.println("Cantidad de organizaciones en documento" + id + " : " + organizationCount);
                 
-                //for (int i = 0; i < locationCount; i++) {
-                    //System.out.println("Documento" + id + " El lugar" + " " + i + " es"  + " " + lugares[i]);
-                //}
-                //System.out.println("Cantidad de lugares en documento" + id + " : " + locationCount);
-                introducedoc(titulo, autor, texto, Integer.toString(id), personas, organizaciones, lugares, personCount, organizationCount, locationCount);
-                vaciaString(personas);
-                vaciaString(organizaciones);
-                vaciaString(lugares);
-                personCount = 0;
-                organizationCount = 0;
-                locationCount = 0;
                 
-               
-                
-                id++;
+            introducedoc(titulo, autor, texto, Integer.toString(id));
+            
+            String p = "Person";
+            //List<String> nuevaLista = encuentraEtiquetas(p);
+            
+            id++;
             }
         }
 
     }
     
     
-    private static void introducedoc(String titulo, String autor, String texto, String id, String [] personas, 
-            String [] organizaciones, String [] lugares, int personCount, int OrganizationCount, int LocationCount) throws SolrServerException, IOException
+    private static void introducedoc(String titulo, String autor, String texto, String id) throws SolrServerException, IOException
     {
         
         
         if(titulo != " " && autor != " " && texto != " "){
             //System.out.println("El titulo es " + " "+ titulo);
             //System.out.println("El autor es " + " "+ autor);
-            //System.out.println("El texto es " + " "+ texto);
+            //ystem.out.println("El texto es " + " "+ texto);
             //System.out.println("El id" + " " + id);
             
             
             
-            SolrClient client = new HttpSolrClient.Builder("http://localhost:8983/solr/gate").build();
+            
+            
+            List<String> personas = new ArrayList<>();
+            List<String> personasTitulo = new ArrayList<>();
+            List<String> personasAutor = new ArrayList<>();
+            List<String> orgs = new ArrayList<>();
+            List<String> orgsTitulo = new ArrayList<>();
+            List<String> orgsAutor = new ArrayList<>();
+            List<String> lugares = new ArrayList<>();
+            List<String> lugaresTitulo = new ArrayList<>();
+            List<String> lugaresAutor = new ArrayList<>(); 
+            
+            //Busqueda de Personas
+            String etiquetaPer = "Person";
+            personasTitulo = buscarContenido(etiquetaPer,titulo);
+            personas = buscarContenido(etiquetaPer,texto);
+            personasAutor = buscarContenido(etiquetaPer,autor);
+            
+            //Busqueda de Organizaciones
+            String etiquetaOrg = "Organization";
+            orgsTitulo = buscarContenido(etiquetaOrg,titulo);
+            orgs = buscarContenido(etiquetaOrg,texto);
+            orgsAutor = buscarContenido(etiquetaOrg,autor);
+            
+            //Busqueda de Lugares
+            String etiquetaLugar = "Location";
+            lugaresTitulo = buscarContenido(etiquetaLugar,titulo);
+            lugares = buscarContenido(etiquetaLugar,texto);
+            lugaresAutor = buscarContenido(etiquetaLugar,autor);
+            
+            //LIMPIAMOS LAS ETIQUETAS
+            
+            
+            
+             //UNION ARRAYS
+            personas.addAll(personasTitulo);
+            personas.addAll(personasAutor);
+            orgs.addAll(orgsTitulo);
+            orgs.addAll(orgsAutor);
+            lugares.addAll(lugaresTitulo);
+            lugares.addAll(lugaresAutor);
+            
+            
+            titulo = reemplazarContenidoEtiqueta(titulo);
+            texto = reemplazarContenidoEtiqueta(texto);
+            autor = reemplazarContenidoEtiqueta(autor);
+            
+            //System.out.println(titulo);
+            //System.out.println("DOCUMENTO:" + id);
+            //System.out.println("Personas: " + personas);
+            //System.out.println("Organizaciones: " + orgs);
+            //System.out.println("Lugares: " + lugares);
+            
+            //Creacion del SolrDoc    
+            SolrClient client = new HttpSolrClient.Builder("http://localhost:8983/solr/gate3").build();
             SolrInputDocument doc = new SolrInputDocument();
         
+            System.out.println("DOCUMENTO: " + id);
             doc.addField("titulo", titulo);
             doc.addField("autor", autor);
             doc.addField("texto", texto);
             doc.addField("idp", id);
             
-            //Tratamiento Strings
-            String [] personas1 = creaString(personas, personCount);
-            String [] organizaciones1 = creaString(organizaciones, OrganizationCount);
-            String [] lugares1 = creaString(lugares, LocationCount);
             
-            if(id.equals("3")){
-                visualizaString(personas1);
+            if (!personas.isEmpty()) {
+                doc.addField("Personas", personas);
             }
             
-            
-            
-            if(personas1.length > 0){
-                doc.addField("Persona", personas1);
-                //System.out.println(persona);
+            if (!orgs.isEmpty()) {
+                doc.addField("Organizaciones", orgs);
             }
-            if(organizaciones1.length > 0){
-                doc.addField("Organizacion", organizaciones1);
-                //System.out.println(organizacion);
-            }
-            if(lugares1.length > 0){
-                doc.addField("Lugar", lugares1);
-                //System.out.println(lugar);
+            
+            if (!lugares.isEmpty()) {
+                doc.addField("Lugares", lugares);
             }
             
             visualizaDoc(doc);
-            
-            
-            
-            client.add(doc);
-            client.commit();
+                
+            //client.add(doc);
+            //client.commit();
         }
     }
     
@@ -290,6 +235,33 @@ public class Version1 {
         return nuevoString;
     }
     
+    
+
+    public static List<String> buscarContenido(String etiqueta, String line) {
+        
+        List<String> contenidoEncontrado = new ArrayList<>();
+        
+        // Patrón regex para encontrar las etiquetas
+        String patron = "<" + etiqueta + ">(.*?)</" + etiqueta + ">";
+        Pattern pattern = Pattern.compile(patron);
+        Matcher matcher = pattern.matcher(line);
+        
+        // Buscar todas las coincidencias en la línea
+        while (matcher.find()) {
+            contenidoEncontrado.add(matcher.group(1)); // Agregar el contenido a la lista
+        }
+        
+        return contenidoEncontrado;
+    }
+    
+    public static String reemplazarContenidoEtiqueta(String input) {
+        // Expresión regular para buscar cualquier etiqueta y reemplazar su contenido
+        String regex = "<([A-Za-z0-9]+)>(.*?)</\\1>";
+        
+        // Reemplazar el contenido utilizando la expresión regular
+        return input.replaceAll(regex, "$2");
+    }
+}
     
      
     
