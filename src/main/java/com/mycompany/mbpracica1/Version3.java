@@ -1,129 +1,134 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
+
 package com.mycompany.mbpracica1;
 
-import static com.mycompany.mbpracica1.Version2.lanzaConsulta;
+import static com.mycompany.mbpracica1.Version3.buscarContenido;
+import static com.mycompany.mbpracica1.Version3.nConsulta;
+import static com.mycompany.mbpracica1.Version3.nRanking;
+import static com.mycompany.mbpracica1.Version3.reemplazarContenidoEtiqueta;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
-import java.lang.StringBuilder;
-import java.util.ArrayList;
-import java.util.List;
-import javax.xml.transform.Source;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 
-/**
- *
- * @author luism
- */
-public class Version3 {
-    static int nRanking = 1;
-    
-    public static int nConsultaParaCisi = 1;
-    static int nConsulta = 1;
-   
-    public static void main(String[] args) throws IOException,
-			SolrServerException {
-       
-       
+public class MBPRACICA1 {
+    public static void main(String[] args) throws SolrServerException {
+        // Ruta del archivo que contiene el texto con el formato proporcionado
+        String ruta = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\corpusquerys.xml";
 
-       String ruta = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\CISI.QRY";
-       File filename = new File(ruta);
-       List<String> contentList = new ArrayList<>(); // Lista para almacenar el contenido de .W
-       StringBuilder currentContent = new StringBuilder(); // StringBuilder para almacenar el contenido actual
+        try {
+            List<String> contentList = getContentBetweenWAndI(ruta);
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                line = line.trim(); // Elimina espacios en blanco al principio y final de la línea
-                if (line.startsWith(".W")) {
-                    if (currentContent.length() > 0) { // Si hay contenido almacenado, añádelo a la lista
-                        contentList.add(currentContent.toString());
-                        currentContent.setLength(0); // Reinicia el StringBuilder
-                    }
-                } else {
-                    currentContent.append(line); // Agrega el contenido al StringBuilder
-                }
+            // Imprimir el contenido entre ".W" y ".I"
+            for (String content : contentList) {
+                System.out.println("QUERY");
+                lanzaConsulta(content);
             }
-            // Añade el último contenido después del último ".W" a la lista si hay contenido
-            if (currentContent.length() > 0) {
-                contentList.add(currentContent.toString());
-            }
-
-            // Imprime el contenido extraído
-            for (String content: contentList) {
-                //System.out.println(content);
-                lanzaConsulta1(content);
-            }
-            
-            
-            
-            
         } catch (IOException e) {
             e.printStackTrace();
         }
-            
-            
-       
-       
-       
-       
-       
-       
-    }   
+    }
+
+    public static List<String> getContentBetweenWAndI(String filePath) throws IOException {
+        List<String> contentList = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            StringBuilder content = new StringBuilder();
+            boolean shouldRead = false;
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.startsWith(".")) {
+                    if (shouldRead) {
+                        contentList.add(content.toString());
+                        content.setLength(0);
+                    }
+                    shouldRead = false;
+                }
+
+                if (shouldRead) {
+                    content.append(line).append("\n");
+                }
+
+                if (line.startsWith(".W")) {
+                    shouldRead = true;
+                }
+            }
+
+            if (shouldRead && content.length() > 0) {
+                contentList.add(content.toString());
+            }
+        }
+
+        return contentList;
+    }
     
     private static void lanzaConsulta(String consulta) throws SolrServerException, IOException   
     {
-        System.out.println(consulta + "\n");
-    }
-    
-    
-    private static void lanzaConsulta1(String consulta) throws SolrServerException, IOException   
-    {
-       HttpSolrClient solr = new HttpSolrClient.Builder("http://localhost:8983/solr/gate").build();
-       SolrQuery query = new SolrQuery();
-       String palabras = consulta.replaceAll("[^a-zA-Z0-9 ]", "");
        
-       System.out.println(palabras); 
+       HttpSolrClient solr = new HttpSolrClient.Builder("http://localhost:8983/solr/gate3").build();
+       SolrQuery query = new SolrQuery();
+       consulta = consulta.replaceAll("[^a-zA-Z0-9 ]","");
+       
+       
+       
+
+       List<String> personas = new ArrayList<>();
+       List<String> orgs = new ArrayList<>();
+       List<String> lugares = new ArrayList<>();
+       
+       String etiquetaPer = "Person";
+       personas = buscarContenido(etiquetaPer,consulta);
+       String etiquetaOrg = "Organization";
+       orgs = buscarContenido(etiquetaOrg,consulta);
+       String etiquetaLugar = "Location";
+       lugares = buscarContenido(etiquetaLugar,consulta);
+       
+       String palabras = reemplazarContenidoEtiqueta(consulta);
+       System.out.println(palabras);
+       
+       if (!personas.isEmpty()) {
+           System.out.println("No esta vacia"); 
+           query.addFilterQuery("Personas: " + personas);
+        }
+
+        if (!orgs.isEmpty()) {
+            System.out.println("Organiazaciones No esta vacia");
+            query.addFilterQuery("Organizaciones: " + orgs);
+        }
+
+        if (!lugares.isEmpty()) {
+            query.addFilterQuery("Lugares: " + lugares);
+        }
+       
+       
        query.setQuery("*");
-       query.setFields("*");
+       query.setFields("autor", "titulo", "score", "idp");
        query.addFilterQuery("texto: " + palabras);
        QueryResponse rsp = solr.query(query);
        SolrDocumentList docs = rsp.getResults();
-       //converTrec(docs,nConsulta);
+       
+       converTrec(docs,nConsulta);
        //System.out.println(nConsulta);
        nConsulta++;
        
        
        
     }
-    
-    private static String eliminarPrimeraPalabra(String input) {
-        if (input == null || input.isEmpty()) {
-            return ""; // Devuelve una cadena vacía si el input es nulo o está vacío
-        }
-
-        int indiceEspacio = input.indexOf(' ');
-        if (indiceEspacio != -1) { // Si se encuentra al menos un espacio en el string
-            return input.substring(indiceEspacio + 1).trim(); // Devuelve el string después del primer espacio
-        } else {
-            return ""; // Si no se encuentra ningún espacio, devuelve una cadena vacía
-        }
-
-    }
-
-    
     
     private static void converTrec(SolrDocumentList docs, int nConsulta) throws IOException
     {
@@ -150,47 +155,32 @@ public class Version3 {
         }
         escritor.close();
         
-        adecuaCisi();
+        //adecuaCisi();
         
     }
     
-    private static void adecuaCisi() throws IOException
-    {
-        String ruta = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\CISI.REL";
-        String ruta2 = "C:\\Users\\luism\\OneDrive\\Documentos\\NetBeansProjects\\PRACTICAMOTORES\\CISI2.TREC";
-        File filename = new File(ruta);
-        File filename2 = new File(ruta2);
-        Scanner scan = new Scanner(filename);
-        BufferedWriter escritor = new BufferedWriter(new FileWriter(filename2,true));
-       
-        while(scan.hasNextLine())
-        {
-            String line = scan.nextLine();
-           
-            //Para declarar que los valores se dividen en tabs
-            String [] valores = line.split("\\s+");
-           
-            String cero = "0";
-            String consulta = valores[1];
-            String documento = valores[2];
-            String score = valores[3];
-            float scoreFl = Float.parseFloat(score);
-            int scoreInt = (int) scoreFl;
-            String scoreSTR = String.valueOf(scoreInt);
-            
-            //System.out.println(consulta);
-            //System.out.println(documento);
-            //System.out.println(scoreSTR);
-           
-           
-            escritor.write(consulta + " " + cero + " " + cero + " " + documento + "\n");
-            
-           
+    public static String reemplazarContenidoEtiqueta(String input) {
+        // Expresión regular para buscar cualquier etiqueta y reemplazar su contenido
+        String regex = "<([A-Za-z0-9]+)>([\\s\\S]*?)</\\1>";
+        
+        // Reemplazar el contenido utilizando la expresión regular
+        return input.replaceAll(regex, "$2");
+    }
+    
+    public static List<String> buscarContenido(String etiqueta, String line) {
+        
+        List<String> contenidoEncontrado = new ArrayList<>();
+        
+        // Patrón regex para encontrar las etiquetas
+        String patron = "<" + etiqueta + ">(.*?)</" + etiqueta + ">";
+        Pattern pattern = Pattern.compile(patron);
+        Matcher matcher = pattern.matcher(line);
+        
+        // Buscar todas las coincidencias en la línea
+        while (matcher.find()) {
+            contenidoEncontrado.add(matcher.group(1)); // Agregar el contenido a la lista
         }
         
-        escritor.close();
-        scan.close();
+        return contenidoEncontrado;
     }
-    
 }
-
